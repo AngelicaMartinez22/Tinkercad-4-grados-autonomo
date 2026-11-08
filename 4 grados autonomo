@@ -1,0 +1,116 @@
+
+#include <Servo.h>
+
+// =================================
+// SERVOMOTORES
+// =================================
+
+Servo servoBase;
+Servo servoHombro;
+Servo servoCodo;
+Servo servoGripper;
+
+// =================================
+// PINES
+// =================================
+
+const int PIN_BASE = 9;
+const int PIN_HOMBRO = 10;
+const int PIN_CODO = 11;
+const int PIN_GRIPPER = 12;
+
+const int BOTON = 4;
+
+// =================================
+// POSICIONES INICIALES
+// =================================
+
+int posBase = 90;
+int posHombro = 90;
+int posCodo = 90;
+int posGripper = 70;
+
+void setup() {
+
+  // Conectar servomotores
+  servoBase.attach(PIN_BASE);
+  servoHombro.attach(PIN_HOMBRO);
+  servoCodo.attach(PIN_CODO);
+  servoGripper.attach(PIN_GRIPPER);
+
+  // Configurar boton
+  pinMode(BOTON, INPUT_PULLUP);
+
+  // Posicion inicial
+  servoBase.write(90);
+  servoHombro.write(90);
+  servoCodo.write(90);
+  servoGripper.write(70);
+
+  delay(1000);
+}
+
+// =================================
+// ESPERAR A QUE PRESIONEN EL BOTON
+// =================================
+
+void loop() {
+
+  if (digitalRead(BOTON) == LOW) {
+
+    delay(50); // Antirrebote
+
+    if (digitalRead(BOTON) == LOW) {
+
+      // 1. Abrir gripper
+      servoGripper.write(70);
+      delay(1000);
+
+      // 2. Girar hacia el objeto
+      servoBase.write(45);
+      delay(1500);
+
+      // 3. Bajar el brazo
+      servoHombro.write(120);
+      servoCodo.write(60);
+      delay(1500);
+
+      // 4. Sujetar el objeto
+      servoGripper.write(120);
+      delay(1500);
+
+      // 5. Levantar el objeto
+      servoHombro.write(75);
+      servoCodo.write(100);
+      delay(1500);
+
+      // 6. Girar hacia el destino
+      servoBase.write(135);
+      delay(1500);
+
+      // 7. Bajar para colocar el objeto
+      servoHombro.write(115);
+      servoCodo.write(65);
+      delay(1500);
+
+      // 8. Soltar el objeto
+      servoGripper.write(70);
+      delay(1500);
+
+      // 9. Regresar a posicion inicial
+      servoBase.write(90);
+      servoHombro.write(90);
+      servoCodo.write(90);
+      servoGripper.write(70);
+
+      delay(1500);
+
+      // Esperar a que suelten el boton
+      while (digitalRead(BOTON) == LOW) {
+        delay(10);
+      }
+
+      delay(50);
+    }
+  }
+}
